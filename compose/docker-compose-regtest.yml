@@ -122,9 +122,12 @@ services:
     environment:
       SETTINGS_CONTEXT: "docker.teranode1.test"
       logLevel: "INFO"
-      # Keep the chain private and single-node: no peer-to-peer, no legacy sync.
-      # Remove these two lines if you later want to connect more regtest nodes.
-      startP2P: "false"
+      # NECESSARY OVERRIDE (BOLT-Stack-Demo): upstream regtest ships P2P OFF for a fully-isolated
+      # single node. We deliberately turn it ON so a local Arcade's chaintracks can track this
+      # node's blocks over libp2p (the demo's SPV header source). Still a single private teranode —
+      # legacy (bitcoind-style) sync stays OFF. (Paired with the p2p_listen/advertise overrides in
+      # settings.conf so libp2p binds a known, dialable port.)
+      startP2P: "true"
       startLegacy: "false"
       KAFKA_BLOCKS: blocks-teranode1
       KAFKA_BLOCKS_FINAL: blocks-final-teranode1
