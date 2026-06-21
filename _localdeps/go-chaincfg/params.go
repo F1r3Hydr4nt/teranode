@@ -455,8 +455,10 @@ var RegressionNetParams = Params{
 	DNSSeeds:    []DNSSeed{},
 
 	// Chain parameters
-	GenesisBlock:             &regTestGenesisBlock,
-	GenesisHash:              newHashFromStr("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"),
+	GenesisBlock: &regTestGenesisBlock,
+	// Recomputed at init() in genesis_privregtest.go (the regtest genesis carries the priv-chain bsv Japanese
+	// coinbase message, so its hash differs from the upstream 0f9188f1... regtest genesis).
+	GenesisHash: &regTestGenesisHash,
 	PowLimit:                 regressionPowLimit,
 	PowLimitBits:             0x207fffff,
 	MaxCoinbaseScriptSigSize: 100,
