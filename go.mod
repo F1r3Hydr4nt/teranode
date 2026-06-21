@@ -4,6 +4,10 @@ go 1.26.0
 
 replace github.com/in-toto/in-toto-golang => github.com/in-toto/in-toto-golang v0.9.0
 
+// private-chain regtest: Genesis + Chronicle active from height 0 (lifts the pre-Genesis 520-byte push
+// limit so the EventTrigger co-spend validates) + Japanese genesis parity with the priv-chain bsv node.
+replace github.com/bsv-blockchain/go-chaincfg => ./_localdeps/go-chaincfg
+
 require (
 	github.com/IBM/sarama v1.45.1
 	github.com/aws/aws-sdk-go-v2 v1.41.5

@@ -597,6 +597,14 @@ func (v *Server) validateTransaction(ctx context.Context, req *validator_api.Val
 		return &validator_api.ValidateTransactionResponse{Valid: false}, err
 	}
 
+	// Intake validation (e.g. an Arcade broadcast via the legacy /tx path) often carries no blockHeight, which
+	// arrives here as 0 -> the gobdk would apply pre-Genesis consensus rules (the 520-byte push limit) even on a
+	// chain where Genesis is long active. Default an unspecified height to the current tip so intake txs are
+	// validated against the live consensus rules (private-chain regtest activates Genesis from height 1).
+	if req.BlockHeight == 0 {
+		req.BlockHeight = v.validator.GetBlockHeight()
+	}
+
 	// Pre-warm the MTP store for BIP68 validation before running transaction validation.
 	// EnsureMTPLoaded is a no-op when BIP68 is not yet active for this blockHeight.
 	if err := v.validator.EnsureMTPLoaded(ctx, req.BlockHeight); err != nil {

@@ -15,6 +15,8 @@ ARG TXMETA_SMALL_TAG=false
 # Download all the go dependecies so Docker can cache them if the go.mod and go.sum files are not changed
 WORKDIR /app
 COPY go.mod go.sum ./
+# local replace target (forked go-chaincfg) must be present before `go mod download` resolves the graph
+COPY _localdeps ./_localdeps
 RUN go mod download
 
 # Copy the source code from the current directory to the working directory inside the container
@@ -53,7 +55,10 @@ COPY --from=0 /app/compose/wait.sh /app/wait.sh
 COPY --from=0 /go/bin/dlv .
 COPY --from=0 /app/settings.conf .
 
-RUN chmod +x ./wait.sh
+# Normalise CRLF -> LF: when the build context is checked out on Windows (autocrlf), wait.sh's shebang becomes
+# "#!/bin/bash\r" and the kernel fails to exec it ("no such file or directory"). settings.conf gets the same
+# treatment defensively. Upstream CI builds on Linux (LF) so never needs this.
+RUN sed -i 's/\r$//' ./wait.sh ./settings.conf && chmod +x ./wait.sh
 
 ENV LD_LIBRARY_PATH=/app:${LD_LIBRARY_PATH}
 ENV PATH=/app:$PATH

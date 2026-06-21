@@ -1077,6 +1077,12 @@ func (s *Server) handleBlockNotification(ctx context.Context, hash *chainhash.Ha
 		ClientName: s.settings.ClientName,
 	}
 
+	// Include the coinbase tx hex so a merkle-service consumer can build the coinbase BUMP and the per-tx
+	// STUMP. Without it, the consumer hits "empty coinbase transaction" and live STUMP delivery is unreliable.
+	if block, berr := s.blockchainClient.GetBlock(ctx, hash); berr == nil && block != nil && block.CoinbaseTx != nil {
+		blockMessage.Coinbase = hex.EncodeToString(block.CoinbaseTx.Bytes())
+	}
+
 	msgBytes, err = json.Marshal(blockMessage)
 	if err != nil {
 		return errors.NewError("blockMessage - json marshal error: %w", err)
