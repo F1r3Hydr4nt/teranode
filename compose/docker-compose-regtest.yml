@@ -54,7 +54,9 @@ services:
 
   kafka-shared:
     container_name: regtest-kafka
-    image: redpandadata/redpanda:latest
+    # Pinned: redpandadata/redpanda:latest drifted to a build that SIGILLs (Invalid instruction)
+    # on this host's CPU. v25.2.1 is the last known-good tag here.
+    image: redpandadata/redpanda:v25.2.1
     networks:
       - teranode-network
     mem_limit: 256m
